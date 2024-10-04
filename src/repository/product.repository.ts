@@ -1,10 +1,10 @@
-import { AppDataSource } from '../database/data-source';
+import { dataSource } from '../database/data-source';
 import { Product } from '../model/product';
 
 export class ProductRepository {
   async getAll() {
     try {
-      const resultSet = await AppDataSource.executeQuery(`
+      const resultSet = await dataSource.executeQuery(`
         SELECT id,name,description,price,stock,createdat,updatedat FROM products ORDER BY createdat
       `);
       return resultSet.rows.map((row) => ({
@@ -22,7 +22,7 @@ export class ProductRepository {
   }
 
   async getById(productId: number): Promise<Product | null> {
-    const resultSet = await AppDataSource.executeQuery(
+    const resultSet = await dataSource.executeQuery(
       `SELECT id,name,description,price,stock,createdat,updatedat FROM products WHERE id=$1;`,
       [productId]
     );
@@ -41,12 +41,10 @@ export class ProductRepository {
   }
 
   async create(product: Product): Promise<Product | null> {
-    const resultSet = await AppDataSource.executeQuery(
+    const resultSet = await dataSource.executeQuery(
       `INSERT INTO products(name,description,price,stock) VALUES($1,$2,$3,$4) RETURNING *;`,
       [product.name, product.description, product.price, product.stock]
     );
-    console.log(resultSet);
-
     if (resultSet.rows.length > 0) {
       return {
         id: resultSet.rows[0].id,
@@ -62,7 +60,7 @@ export class ProductRepository {
   }
 
   async update(productId: number, product: Product): Promise<Product | null> {
-    const resultSet = await AppDataSource.executeQuery(
+    const resultSet = await dataSource.executeQuery(
       `UPDATE products SET name=$1,description=$2,price=$3,stock=$4 WHERE id=$5 RETURNING *;`,
       [product.name, product.description, product.price, product.stock, productId]
     );
@@ -82,7 +80,7 @@ export class ProductRepository {
 
   async delete(productId: number): Promise<boolean> {
     try {
-      await AppDataSource.executeQuery(`DELETE FROM products WHERE id=$1;`, [productId]);
+      await dataSource.executeQuery(`DELETE FROM products WHERE id=$1;`, [productId]);
       return true;
     } catch (error) {
       return false;

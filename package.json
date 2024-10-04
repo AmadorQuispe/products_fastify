@@ -5,6 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "ts-node src/database/migrate.ts",
     "lint": "ts-standard",
     "build": "tsc",
     "dev": "ts-node-dev src/main.ts",
